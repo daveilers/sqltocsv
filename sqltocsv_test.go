@@ -117,10 +117,20 @@ func TestSetTimeFormat(t *testing.T) {
 	assertCsvMatch(t, expected, actual)
 }
 
-func TestConvertingNilValueShouldReturnEmptyString(t *testing.T) {
+func TestDefaultConvertingNilValueShouldReturnEmptyString(t *testing.T) {
 	converter := sqltocsv.New(getTestRowsByQuery(t, "SELECT|people|name,nickname,age|"))
 
 	expected := "name,nickname,age\nAlice,,1\n"
+	actual := converter.String()
+
+	assertCsvMatch(t, expected, actual)
+}
+
+func TestConvertingNilValueShouldReturnNullString(t *testing.T) {
+	converter := sqltocsv.New(getTestRowsByQuery(t, "SELECT|people|name,nickname,age|"))
+	converter.NullString = `\N` // this is what mysql uses for imports
+
+	expected := "name,nickname,age\nAlice,\\N,1\n"
 	actual := converter.String()
 
 	assertCsvMatch(t, expected, actual)

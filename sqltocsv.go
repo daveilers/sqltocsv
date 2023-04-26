@@ -50,6 +50,7 @@ type Converter struct {
 	TimeFormat   string   // Format string for any time.Time values (default is time's default)
 	FloatFormat  string   // Format string for any float64 and float32 values (default is %v)
 	Delimiter    rune     // Delimiter to use in your CSV (default is comma)
+	NullString   string   // String to return for NULL values (default is blank)
 
 	rows            *sql.Rows
 	rowPreProcessor CsvPreProcessorFunc
@@ -162,7 +163,7 @@ func (c Converter) Write(writer io.Writer) error {
 			}
 
 			if value == nil {
-				row[i] = ""
+				row[i] = c.NullString
 			} else {
 				row[i] = fmt.Sprintf("%v", value)
 			}
@@ -187,7 +188,7 @@ func (c Converter) Write(writer io.Writer) error {
 }
 
 // New will return a Converter which will write your CSV however you like
-// but will allow you to set a bunch of non-default behaivour like overriding
+// but will allow you to set a bunch of non-default behaviour like overriding
 // headers or injecting a pre-processing step into your conversion
 func New(rows *sql.Rows) *Converter {
 	return &Converter{
